@@ -6,6 +6,8 @@
 <title>نموذج ملاءمة المهن والتخصصات — مركز البيانات الوطني التفاعلي</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 :root {
   --navy:        #1b3a5c;
@@ -727,80 +729,81 @@ body {
 .chart-area.sm { height: 190px; display: flex; align-items: center; justify-content: center; }
 
 /* ─── MAP ─────────────────────────────────────────── */
-.map-wrap { display: flex; gap: 24px; align-items: flex-start; }
-
-.geo-grid { flex: 1; display: flex; flex-direction: column; gap: 6px; }
-.geo-row  { display: flex; gap: 6px; }
-
-.geo-cell {
-  flex: 1;
-  min-height: 58px;
+#jordanMap {
+  height: 460px;
   border-radius: var(--radius);
-  padding: 9px 10px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  border: 1px solid var(--border);
+  z-index: 1;
+}
+
+/* Leaflet popup */
+.leaflet-popup-content-wrapper {
+  font-family: 'Cairo', sans-serif;
+  direction: rtl;
+  border-radius: 8px !important;
+  box-shadow: 0 10px 32px rgba(0,0,0,0.20) !important;
+  border: 1px solid #dde2e9;
+  padding: 0 !important;
+  overflow: hidden;
+}
+.leaflet-popup-content { margin: 0 !important; }
+.leaflet-popup-tip { background: #fff !important; }
+
+/* Permanent gov label (bindTooltip) */
+.gov-lbl {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+.gov-lbl::before { display: none !important; }
+
+.gov-label-inner {
+  background: rgba(255,255,255,0.93);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-radius: 6px;
+  padding: 5px 10px;
+  text-align: center;
+  font-family: 'Cairo', sans-serif;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.06);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.gov-label-name {
   font-size: 12px;
   font-weight: 700;
-  border: 1px solid transparent;
+  color: #1b3a5c;
+  line-height: 1.4;
+}
+.gov-label-pct {
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.2;
 }
 
-.geo-cell.blank { background: transparent; border-color: transparent; }
-
-.geo-cell.level-high {
-  background: var(--green-bg);
-  border-color: #b7e3ca;
-  color: var(--green);
-}
-.geo-cell.level-mid {
-  background: var(--amber-bg);
-  border-color: #f3d898;
-  color: var(--amber);
-}
-.geo-cell.level-low {
-  background: var(--red-bg);
-  border-color: #f5c4c4;
-  color: var(--red);
-}
-.geo-cell.level-off {
-  background: var(--bg);
-  border-color: var(--border);
-  color: var(--text-light);
-}
-
-.geo-name  { font-size: 12px; }
-.geo-score { font-size: 17px; font-weight: 800; }
-.geo-off-label { font-size: 10.5px; font-weight: 500; }
-
-.map-legend {
+.map-legend-panel {
+  margin-top: 14px;
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 10px 0;
-  min-width: 140px;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--text-muted);
 }
 
-.legend-row { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); }
+.map-legend-panel .legend-item { display: flex; align-items: center; gap: 6px; }
 
-.legend-block {
-  width: 14px; height: 14px;
-  border-radius: 2px;
+.legend-swatch {
+  width: 16px; height: 16px;
+  border-radius: 3px;
   border: 1px solid transparent;
   flex-shrink: 0;
 }
-.lb-high { background: var(--green-bg); border-color: #b7e3ca; }
-.lb-mid  { background: var(--amber-bg); border-color: #f3d898; }
-.lb-low  { background: var(--red-bg);   border-color: #f5c4c4; }
-.lb-off  { background: var(--bg);       border-color: var(--border); }
-
-.map-note {
-  font-size: 11px;
-  color: var(--text-light);
-  margin-top: 12px;
-  line-height: 1.7;
-  border-top: 1px solid var(--border);
-  padding-top: 10px;
-}
+.ls-high { background: #b7e8c8; border-color: #38a169; }
+.ls-mid  { background: #fde9a2; border-color: #d69e2e; }
+.ls-low  { background: #fed7d7; border-color: #c53030; }
+.ls-off  { background: #e9ecef; border-color: #adb5bd; }
 
 /* ─── REPORT ──────────────────────────────────────── */
 .report-sec { margin-bottom: 24px; }
@@ -1109,19 +1112,16 @@ footer {
 
       <!-- MAP -->
       <div class="tab-pane" id="tab-map">
-        <div style="font-size:12.5px;color:var(--text-muted);margin-bottom:16px;">
-          يُظهر الجدول الجغرافي توزيع مستوى الطلب على التخصصات المختارة في المحافظات المحددة. البيانات مبنية على مسح قوة العمل والسجلات الإدارية.
+        <div style="font-size:12.5px;color:var(--text-muted);margin-bottom:14px;">
+          يُظهر الخريطة التفاعلية توزيع مستوى الطلب على التخصصات المختارة في المحافظات المحددة. انقر على أي محافظة للاطلاع على تفاصيلها.
         </div>
-        <div class="map-wrap">
-          <div class="geo-grid" id="geoGrid"></div>
-          <div class="map-legend">
-            <div style="font-size:11.5px;font-weight:800;color:var(--text);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">مستوى الطلب</div>
-            <div class="legend-row"><div class="legend-block lb-high"></div> مرتفع (أكثر من 75%)</div>
-            <div class="legend-row"><div class="legend-block lb-mid"></div> متوسط (50 — 75%)</div>
-            <div class="legend-row"><div class="legend-block lb-low"></div> منخفض (أقل من 50%)</div>
-            <div class="legend-row"><div class="legend-block lb-off"></div> خارج نطاق الاختيار</div>
-            <div class="map-note">النسبة تمثل متوسط<br>مستوى الطلب لجميع<br>التخصصات المختارة<br>في كل محافظة.</div>
-          </div>
+        <div id="jordanMap"></div>
+        <div class="map-legend-panel">
+          <strong style="color:var(--text);font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;">مستوى الطلب:</strong>
+          <div class="legend-item"><div class="legend-swatch ls-high"></div> مرتفع (أكثر من 75%)</div>
+          <div class="legend-item"><div class="legend-swatch ls-mid"></div> متوسط (50 — 75%)</div>
+          <div class="legend-item"><div class="legend-swatch ls-low"></div> منخفض (أقل من 50%)</div>
+          <div class="legend-item"><div class="legend-swatch ls-off"></div> خارج نطاق الاختيار</div>
         </div>
       </div>
 
@@ -1200,15 +1200,6 @@ const GOVS = [
   { id:'maan',   name:'معان',     w:0.50 },
 ];
 
-// Approximate geographic layout [row, col] in 7×4 grid
-const GEO = {
-  mafraq:[0,2], ajloun:[1,0], irbid:[1,1], jarash:[1,2],
-  balqa:[2,0],  amman:[2,1],  zarqa:[2,2],
-  madaba:[3,0], karak:[3,1],
-  tafila:[4,1],
-  maan:[5,1],
-  aqaba:[6,1],
-};
 
 /* ════════════════════════════════════════════
    STATE
@@ -1427,6 +1418,11 @@ function paint(data) {
   paintMap(data);
   paintReport(data);
   paintExplanation(data);
+  // Reset to first tab on new run
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-table').classList.add('active');
+  document.querySelector('.tab-btn').classList.add('active');
 }
 
 /* KPIs */
@@ -1570,35 +1566,204 @@ function paintCharts({ specs, forecast, yearLabels }) {
   });
 }
 
-/* Map */
-function paintMap({ mapScores }) {
-  const grid = document.getElementById('geoGrid');
-  grid.innerHTML = '';
-  const ROWS=7, COLS=4;
-  const cells = Array.from({length:ROWS},()=>Array(COLS).fill(null));
-  GOVS.forEach(g => { const p=GEO[g.id]; if(p) cells[p[0]][p[1]]=g; });
+/* ════════════════════════════════════════════
+   JORDAN GOVERNORATES GEOJSON (simplified)
+════════════════════════════════════════════ */
+const JORDAN_GEOJSON = { type:"FeatureCollection", features:[
+  { type:"Feature", properties:{id:"irbid",name:"إربد"},
+    geometry:{ type:"Polygon", coordinates:[[
+      [35.553,32.548],[35.760,32.647],[36.050,32.625],[36.370,32.555],
+      [36.400,32.350],[36.200,32.150],[35.900,32.155],[35.680,32.190],
+      [35.553,32.548]
+    ]]}},
+  { type:"Feature", properties:{id:"ajloun",name:"عجلون"},
+    geometry:{ type:"Polygon", coordinates:[[
+      [35.680,32.390],[35.900,32.395],[35.935,32.275],[35.900,32.155],
+      [35.680,32.190],[35.655,32.290],[35.680,32.390]
+    ]]}},
+  { type:"Feature", properties:{id:"jarash",name:"جرش"},
+    geometry:{ type:"Polygon", coordinates:[[
+      [35.900,32.395],[36.085,32.420],[36.160,32.380],[36.200,32.150],
+      [35.935,32.145],[35.900,32.155],[35.935,32.275],[35.900,32.395]
+    ]]}},
+  { type:"Feature", properties:{id:"mafraq",name:"المفرق"},
+    geometry:{ type:"Polygon", coordinates:[[
+      [36.085,32.420],[36.160,32.380],[36.200,32.150],[36.370,32.555],
+      [36.400,32.350],[38.950,32.780],[39.300,33.380],[36.100,33.380],
+      [36.085,32.420]
+    ]]}},
+  { type:"Feature", properties:{id:"balqa",name:"البلقاء"},
+    geometry:{ type:"Polygon", coordinates:[[
+      [35.553,32.140],[35.680,32.190],[35.900,32.155],[36.200,32.150],
+      [36.160,31.980],[35.950,31.870],[35.700,31.865],[35.553,31.960],
+      [35.553,32.140]
+    ]]}},
+  { type:"Feature", properties:{id:"zarqa",name:"الزرقاء"},
+    geometry:{ type:"Polygon", coordinates:[[
+      [35.900,32.155],[36.200,32.150],[36.400,32.350],[36.560,32.235],
+      [36.600,31.980],[36.520,31.860],[36.160,31.860],[35.950,31.870],
+      [36.160,31.980],[36.200,32.150],[35.900,32.155]
+    ]]}},
+  { type:"Feature", properties:{id:"amman",name:"عمّان"},
+    geometry:{ type:"Polygon", coordinates:[[
+      [35.553,31.960],[35.700,31.865],[35.950,31.870],[36.160,31.860],
+      [36.520,31.860],[36.600,31.980],[36.680,31.560],[36.520,31.430],
+      [36.200,31.360],[35.800,31.380],[35.553,31.600],[35.553,31.960]
+    ]]}},
+  { type:"Feature", properties:{id:"madaba",name:"مادبا"},
+    geometry:{ type:"Polygon", coordinates:[[
+      [35.553,31.600],[35.800,31.380],[36.200,31.360],[36.520,31.430],
+      [36.380,31.160],[36.100,30.980],[35.750,30.990],[35.553,31.180],
+      [35.553,31.600]
+    ]]}},
+  { type:"Feature", properties:{id:"karak",name:"الكرك"},
+    geometry:{ type:"Polygon", coordinates:[[
+      [35.553,31.180],[35.750,30.990],[36.100,30.980],[36.380,31.160],
+      [36.680,31.560],[36.760,31.030],[36.550,30.820],[36.000,30.780],
+      [35.553,30.900],[35.553,31.180]
+    ]]}},
+  { type:"Feature", properties:{id:"tafila",name:"الطفيلة"},
+    geometry:{ type:"Polygon", coordinates:[[
+      [35.553,30.900],[36.000,30.780],[36.550,30.820],[36.760,31.030],
+      [36.680,30.480],[36.200,30.420],[35.553,30.480],[35.553,30.900]
+    ]]}},
+  { type:"Feature", properties:{id:"maan",name:"معان"},
+    geometry:{ type:"Polygon", coordinates:[[
+      [35.553,30.480],[36.200,30.420],[36.680,30.480],[38.000,30.050],
+      [38.500,29.800],[38.000,29.600],[37.300,29.590],[35.553,29.620],
+      [35.553,30.480]
+    ]]}},
+  { type:"Feature", properties:{id:"aqaba",name:"العقبة"},
+    geometry:{ type:"Polygon", coordinates:[[
+      [35.000,29.620],[35.553,29.620],[37.300,29.590],[37.550,29.200],
+      [35.000,29.185],[35.000,29.620]
+    ]]}}
+]};
 
-  cells.forEach(row => {
-    const rowEl = document.createElement('div');
-    rowEl.className = 'geo-row';
-    row.forEach(g => {
-      const cell = document.createElement('div');
-      if (!g) {
-        cell.className = 'geo-cell blank';
-      } else if (!govSel.includes(g.id)) {
-        cell.className = 'geo-cell level-off';
-        cell.innerHTML = `<span class="geo-name">${g.name}</span><span class="geo-off-label">—</span>`;
-      } else {
-        const sc  = mapScores[g.id] || 50;
-        const lvl = sc>=75?'high':sc>=50?'mid':'low';
-        cell.className = `geo-cell level-${lvl}`;
-        cell.innerHTML = `<span class="geo-name">${g.name}</span><span class="geo-score">${sc}%</span>`;
-        cell.title = `${g.name} — مستوى الطلب: ${sc}%`;
-      }
-      rowEl.appendChild(cell);
-    });
-    grid.appendChild(rowEl);
+/* Map */
+let leafletMap  = null;
+let govLayers   = {};
+let labelLayers = [];
+let lastMapData = null;
+
+function scoreStyle(score) {
+  if (score >= 80) return { fill:'#48bb78', border:'#22543d', text:'#22543d', bg:'#c6f6d5', label:'مرتفع جداً' };
+  if (score >= 65) return { fill:'#68d391', border:'#276749', text:'#276749', bg:'#c6f6d5', label:'مرتفع' };
+  if (score >= 50) return { fill:'#f6e05e', border:'#975a16', text:'#744210', bg:'#fefcbf', label:'متوسط' };
+  if (score >= 38) return { fill:'#fc8181', border:'#9b2c2c', text:'#742a2a', bg:'#fff5f5', label:'منخفض' };
+  return                   { fill:'#f56565', border:'#822727', text:'#63171b', bg:'#fff5f5', label:'منخفض جداً' };
+}
+
+function paintMap(data) {
+  lastMapData = data;
+  const { mapScores, specs } = data;
+  const govInfo = GOVS.reduce((m,g) => { m[g.id]=g; return m; }, {});
+
+  if (!leafletMap) {
+    leafletMap = L.map('jordanMap', {
+      zoomControl: true, attributionControl: false, preferCanvas: false
+    }).setView([31.5, 36.5], 7);
+
+    // Voyager tile — has city names, roads, clean look
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+      { maxZoom: 13, minZoom: 5 }).addTo(leafletMap);
+  }
+
+  Object.values(govLayers).forEach(l => leafletMap.removeLayer(l));
+  labelLayers.forEach(l => leafletMap.removeLayer(l));
+  govLayers = {};
+  labelLayers = [];
+
+  const activeBounds = [];
+
+  JORDAN_GEOJSON.features.forEach(feat => {
+    const gid      = feat.properties.id;
+    const gname    = feat.properties.name;
+    const isActive = govSel.includes(gid);
+    const score    = isActive ? (mapScores[gid] || 50) : null;
+    const govW     = govInfo[gid]?.w || 1;
+    const ss       = isActive ? scoreStyle(score) : null;
+
+    const baseStyle = isActive
+      ? { fillColor: ss.fill, fillOpacity: 0.65, color: ss.border, weight: 2.5, opacity: 1, dashArray: null }
+      : { fillColor: '#e8ecf0', fillOpacity: 0.45, color: '#b8c0cc', weight: 1, opacity: 0.7, dashArray: '5,4' };
+
+    const layer = L.geoJSON(feat, { style: baseStyle });
+
+    if (isActive) {
+      layer.on('mouseover', e => {
+        e.layer.setStyle({ fillOpacity: 0.85, weight: 3.5, color: '#1b3a5c' });
+        e.layer.bringToFront();
+      });
+      layer.on('mouseout', e => {
+        e.layer.setStyle({ fillOpacity: 0.65, weight: 2.5, color: ss.border });
+      });
+
+      // ── Detailed popup ──
+      const demand  = Math.round(specs.reduce((s,sp)=>s+sp.demand,0) * govW / specs.length);
+      const supply  = Math.round(specs.reduce((s,sp)=>s+sp.supply,0) * govW / specs.length);
+      const gap     = demand - supply;
+      const gapClr  = gap > 0 ? '#276749' : '#8b2020';
+
+      const barRows = specs.map(sp => {
+        const sc  = Math.min(100, Math.max(20, Math.round(sp.compat * govW + (Math.random()-0.5)*5)));
+        const st  = scoreStyle(sc);
+        const bar = `<div style="height:6px;border-radius:3px;background:${st.fill};border:1px solid ${st.border};width:${sc}%"></div>`;
+        return `<div style="margin-bottom:7px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px">
+            <span style="font-size:11.5px;color:#1e2a38;font-weight:600">${sp.name}</span>
+            <span style="font-size:12px;font-weight:800;color:${st.text}">${sc}%</span>
+          </div>
+          <div style="height:6px;border-radius:3px;background:#edf2f7;overflow:hidden">${bar}</div>
+        </div>`;
+      }).join('');
+
+      const popupHtml = `<div style="font-family:'Cairo',sans-serif;direction:rtl;width:270px;padding:16px">
+        <div style="display:flex;align-items:center;gap:10px;padding-bottom:12px;border-bottom:1px solid #edf2f7;margin-bottom:12px">
+          <div style="width:40px;height:40px;border-radius:8px;background:${ss.bg};border:2px solid ${ss.border};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <span style="font-size:18px;font-weight:900;color:${ss.text}">${score}</span>
+          </div>
+          <div>
+            <div style="font-size:15px;font-weight:800;color:#1b3a5c;line-height:1.2">${gname}</div>
+            <div style="font-size:11px;font-weight:700;color:${ss.text};margin-top:2px">${ss.label}</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:14px">
+          ${[['العرض',supply,'#2d5986'],['الطلب',demand,'#276749'],['الفجوة',(gap>0?'+':'')+Math.abs(gap).toLocaleString('ar-JO'),gapClr]].map(([lbl,val,clr])=>`
+          <div style="background:#f7fafc;border:1px solid #e2e8f0;border-radius:5px;padding:7px 5px;text-align:center">
+            <div style="font-size:9.5px;color:#718096;font-weight:600;margin-bottom:3px">${lbl}</div>
+            <div style="font-size:12px;font-weight:800;color:${clr}">${typeof val==='number'?val.toLocaleString('ar-JO'):val}</div>
+          </div>`).join('')}
+        </div>
+        <div style="font-size:11px;font-weight:700;color:#4a5568;text-transform:uppercase;letter-spacing:.5px;margin-bottom:9px;padding-bottom:6px;border-bottom:1px solid #edf2f7">ملاءمة التخصصات</div>
+        ${barRows}
+      </div>`;
+
+      layer.bindPopup(popupHtml, { maxWidth: 300, minWidth: 280 });
+
+      // ── Permanent label via bindTooltip ──
+      layer.bindTooltip(`<div class="gov-label-inner">
+        <div class="gov-label-name">${gname}</div>
+        <div class="gov-label-pct" style="color:${ss.text}">${score}%</div>
+      </div>`, { permanent: true, direction: 'center', className: 'gov-lbl', interactive: false });
+
+      try { activeBounds.push(layer.getBounds()); } catch(e) {}
+    }
+
+    layer.addTo(leafletMap);
+    govLayers[gid] = layer;
   });
+
+  // Auto-zoom to fit selection with padding
+  if (activeBounds.length > 0) {
+    const combined = activeBounds.reduce((b, nb) => b.extend(nb), activeBounds[0]);
+    setTimeout(() => {
+      leafletMap.invalidateSize();
+      leafletMap.fitBounds(combined, { padding: [55, 55], maxZoom: 11 });
+    }, 80);
+  } else {
+    setTimeout(() => leafletMap.invalidateSize(), 80);
+  }
 }
 
 /* Report */
@@ -1692,6 +1857,7 @@ function switchTab(name, btn) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
   btn.classList.add('active');
+  if (name === 'map' && leafletMap) setTimeout(() => leafletMap.invalidateSize(), 60);
 }
 
 /* ════════════════════════════════════════════
