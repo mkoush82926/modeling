@@ -1,0 +1,1719 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نموذج مالءمة المهن والتخصصات — مركز البيانات الوطني التفاعلي</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --navy:        #1b3a5c;
+  --navy-dark:   #122741;
+  --navy-light:  #2d5986;
+  --gold:        #b8954a;
+  --gold-light:  #d4af6e;
+  --bg:          #f5f6f8;
+  --card:        #ffffff;
+  --border:      #dde2e9;
+  --border-soft: #eceff4;
+  --text:        #1e2a38;
+  --text-muted:  #5a6a7e;
+  --text-light:  #8898aa;
+  --green:       #276749;
+  --green-bg:    #edf7f2;
+  --green-mid:   #38a169;
+  --amber:       #92600a;
+  --amber-bg:    #fef8ed;
+  --amber-mid:   #d69e2e;
+  --red:         #8b2020;
+  --red-bg:      #fef0f0;
+  --red-mid:     #c53030;
+  --radius:      3px;
+  --shadow:      0 1px 4px rgba(0,0,0,0.07);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Cairo', 'Segoe UI', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  direction: rtl;
+  font-size: 14px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── NAVBAR ─────────────────────────────────────── */
+.navbar {
+  background: var(--navy-dark);
+  color: #fff;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  gap: 20px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 2px solid var(--gold);
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-logo {
+  width: 32px;
+  height: 32px;
+  border: 1.5px solid var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--gold);
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.nav-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.2px;
+}
+
+.nav-sub {
+  font-size: 10.5px;
+  color: rgba(255,255,255,0.5);
+  font-weight: 400;
+  letter-spacing: 0.3px;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-right: auto;
+}
+
+.nav-link {
+  padding: 6px 16px;
+  color: rgba(255,255,255,0.6);
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 500;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color .15s;
+  border-bottom: 2px solid transparent;
+  line-height: 32px;
+}
+
+.nav-link:hover { color: rgba(255,255,255,0.9); }
+.nav-link.active {
+  color: #fff;
+  font-weight: 700;
+  border-bottom-color: var(--gold);
+}
+
+/* ─── BREADCRUMB ──────────────────────────────────── */
+.breadcrumb-bar {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.breadcrumb-bar span { color: var(--border); }
+.breadcrumb-bar a { color: var(--text-muted); text-decoration: none; }
+.breadcrumb-bar a:hover { color: var(--navy-light); }
+.breadcrumb-bar .current { color: var(--text); font-weight: 600; }
+
+/* ─── PAGE HEADER ─────────────────────────────────── */
+.page-header {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  padding: 24px 32px;
+}
+
+.page-header-inner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.page-title {
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--navy);
+  margin-bottom: 5px;
+  letter-spacing: -0.3px;
+}
+
+.page-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  max-width: 620px;
+  line-height: 1.7;
+}
+
+.page-access-badge {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 6px 12px;
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.access-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green-mid);
+}
+
+/* ─── LAYOUT ──────────────────────────────────────── */
+.main {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 28px 24px;
+}
+
+/* ─── ALERT ───────────────────────────────────────── */
+.alert {
+  border: 1px solid var(--border);
+  border-right: 3px solid var(--amber-mid);
+  border-radius: var(--radius);
+  background: var(--amber-bg);
+  padding: 12px 16px;
+  font-size: 12.5px;
+  color: var(--amber);
+  margin-bottom: 22px;
+  line-height: 1.7;
+}
+
+.alert strong { font-weight: 700; }
+
+/* ─── CARD ────────────────────────────────────────── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+
+.card-head {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-soft);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-head-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--navy);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-head-title::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 16px;
+  background: var(--gold);
+  border-radius: 2px;
+}
+
+.card-body { padding: 22px; }
+
+/* ─── FORM ────────────────────────────────────────── */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px 28px;
+}
+
+.form-col-full { grid-column: 1 / -1; }
+
+.form-field { display: flex; flex-direction: column; gap: 7px; }
+
+.form-label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.req { color: var(--red); font-size: 14px; line-height: 1; }
+
+.form-hint {
+  font-size: 11.5px;
+  color: var(--text-light);
+  font-weight: 400;
+  margin-right: 4px;
+}
+
+/* ─── READONLY FIELD ──────────────────────────────── */
+.field-readonly {
+  height: 38px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--bg);
+  font-family: 'Cairo', inherit;
+  letter-spacing: 0.5px;
+}
+
+/* ─── CUSTOM MULTISELECT ──────────────────────────── */
+.ms-wrap { position: relative; }
+
+.ms-box {
+  min-height: 38px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 36px 4px 10px;
+  background: var(--card);
+  cursor: pointer;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  align-items: center;
+  position: relative;
+  transition: border-color .15s;
+}
+
+.ms-box:hover { border-color: #aab4c0; }
+.ms-box.open { border-color: var(--navy-light); outline: 2px solid rgba(45,89,134,.12); }
+.ms-box.has-error { border-color: var(--red-mid); }
+
+.ms-chevron {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+  color: var(--text-light);
+  transition: transform .2s;
+}
+
+.ms-box.open .ms-chevron { transform: translateY(-50%) rotate(180deg); }
+
+.ms-placeholder {
+  font-size: 13px;
+  color: var(--text-light);
+  padding: 3px 0;
+}
+
+.ms-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #e8f0f9;
+  color: var(--navy);
+  border: 1px solid #c4d5ea;
+  border-radius: 2px;
+  padding: 2px 7px 2px 5px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.ms-tag-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  transition: color .1s;
+}
+
+.ms-tag-remove:hover { color: var(--red-mid); }
+
+.ms-panel {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0; left: 0;
+  background: var(--card);
+  border: 1px solid var(--navy-light);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+  z-index: 200;
+  flex-direction: column;
+  max-height: 300px;
+}
+
+.ms-panel.open { display: flex; }
+
+.ms-search-row {
+  padding: 10px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.ms-search-input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 7px 10px;
+  font-size: 12.5px;
+  font-family: 'Cairo', inherit;
+  direction: rtl;
+  outline: none;
+  transition: border-color .15s;
+}
+
+.ms-search-input:focus { border-color: var(--navy-light); }
+
+.ms-list { overflow-y: auto; flex: 1; }
+
+.ms-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border-soft);
+  transition: background .1s;
+}
+
+.ms-item:last-child { border-bottom: none; }
+.ms-item:hover { background: #f4f7fb; }
+.ms-item.disabled { opacity: 0.38; cursor: default; pointer-events: none; }
+.ms-item input[type="checkbox"] { accent-color: var(--navy-light); flex-shrink: 0; }
+
+.ms-item-sub {
+  font-size: 11px;
+  color: var(--text-light);
+  margin-right: 2px;
+}
+
+.ms-empty { padding: 16px; text-align: center; color: var(--text-light); font-size: 12.5px; }
+
+.ms-footer {
+  padding: 6px 12px;
+  border-top: 1px solid var(--border-soft);
+  font-size: 11.5px;
+  color: var(--text-light);
+  background: var(--bg);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ─── GOV GRID ────────────────────────────────────── */
+.gov-selector {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.gov-selector.has-error { border-color: var(--red-mid); }
+
+.gov-kingdom {
+  padding: 9px 14px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--navy);
+}
+
+.gov-kingdom input { accent-color: var(--navy-light); }
+
+.gov-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border-soft);
+  padding: 1px;
+}
+
+.gov-option {
+  background: var(--card);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background .1s;
+}
+
+.gov-option:hover { background: #f4f7fb; }
+.gov-option.active { background: #eaf2fb; font-weight: 600; color: var(--navy); }
+.gov-option input { accent-color: var(--navy-light); }
+
+/* ─── GENDER ──────────────────────────────────────── */
+.gender-group { display: flex; gap: 8px; }
+
+.gender-option {
+  flex: 1;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 9px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  background: var(--card);
+  transition: all .15s;
+}
+
+.gender-option:hover { border-color: #aab4c0; background: #fafbfc; }
+.gender-option.active { border-color: var(--navy-light); background: #eaf2fb; color: var(--navy); font-weight: 700; }
+.gender-option input { accent-color: var(--navy-light); }
+
+/* ─── SELECT ──────────────────────────────────────── */
+.form-select {
+  height: 38px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0 12px;
+  font-size: 13px;
+  font-family: 'Cairo', inherit;
+  color: var(--text);
+  background: var(--card);
+  width: 100%;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%238898aa' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 12px center;
+  transition: border-color .15s;
+}
+
+.form-select:focus { border-color: var(--navy-light); outline: 2px solid rgba(45,89,134,.12); }
+.form-select.has-error { border-color: var(--red-mid); }
+
+/* ─── BUTTONS ─────────────────────────────────────── */
+.btn-row { display: flex; gap: 10px; padding-top: 6px; }
+
+.btn {
+  padding: 9px 24px;
+  border-radius: var(--radius);
+  font-size: 13.5px;
+  font-weight: 700;
+  font-family: 'Cairo', inherit;
+  cursor: pointer;
+  border: none;
+  transition: background .15s, box-shadow .15s;
+  letter-spacing: 0.2px;
+}
+
+.btn-primary {
+  background: var(--navy);
+  color: #fff;
+}
+.btn-primary:hover { background: var(--navy-light); }
+.btn-primary:active { background: var(--navy-dark); }
+
+.btn-outline {
+  background: var(--card);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+.btn-outline:hover { background: var(--bg); border-color: #aab4c0; color: var(--text); }
+
+/* ─── FIELD ERROR ─────────────────────────────────── */
+.field-err {
+  font-size: 11.5px;
+  color: var(--red-mid);
+  display: none;
+  margin-top: 2px;
+}
+.field-err.show { display: block; }
+
+/* ─── LOADING ─────────────────────────────────────── */
+.loading-mask {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(18,39,65,0.6);
+  z-index: 999;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+.loading-mask.show { display: flex; }
+
+.spinner {
+  width: 40px; height: 40px;
+  border: 3px solid rgba(255,255,255,0.2);
+  border-top-color: rgba(255,255,255,0.9);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-msg { color: rgba(255,255,255,0.9); font-size: 14px; font-weight: 600; }
+.loading-sub { color: rgba(255,255,255,0.55); font-size: 12px; }
+
+/* ─── RESULTS ─────────────────────────────────────── */
+#results { display: none; }
+#results.show { display: block; animation: rise .35s ease; }
+@keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ─── KPI ROW ─────────────────────────────────────── */
+.kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+
+.kpi {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  border-right: 3px solid var(--navy-light);
+  padding: 15px 16px;
+}
+
+.kpi.green  { border-right-color: var(--green-mid); }
+.kpi.amber  { border-right-color: var(--amber-mid); }
+.kpi.red    { border-right-color: var(--red-mid); }
+.kpi.navy   { border-right-color: var(--navy-light); }
+
+.kpi-label { font-size: 11.5px; color: var(--text-muted); margin-bottom: 7px; font-weight: 500; }
+.kpi-value { font-size: 26px; font-weight: 800; color: var(--navy); line-height: 1; letter-spacing: -0.5px; }
+.kpi-value.green { color: var(--green); }
+.kpi-value.amber { color: var(--amber); }
+.kpi-value.red   { color: var(--red); }
+.kpi-meta  { font-size: 11px; color: var(--text-light); margin-top: 5px; }
+
+/* ─── TABS ────────────────────────────────────────── */
+.tab-nav {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  padding: 0 20px;
+  gap: 0;
+}
+
+.tab-btn {
+  padding: 12px 18px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: 'Cairo', inherit;
+  font-weight: 600;
+  color: var(--text-muted);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color .15s, border-color .15s;
+}
+
+.tab-btn:hover { color: var(--navy-light); }
+.tab-btn.active { color: var(--navy); border-bottom-color: var(--navy); }
+
+.tab-pane { display: none; padding: 22px; }
+.tab-pane.active { display: block; }
+
+/* ─── TABLE ───────────────────────────────────────── */
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+.data-table thead tr {
+  background: var(--navy);
+  color: #fff;
+}
+
+.data-table thead th {
+  padding: 10px 14px;
+  text-align: right;
+  font-weight: 600;
+  font-size: 12.5px;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+.data-table tbody tr {
+  border-bottom: 1px solid var(--border-soft);
+  transition: background .1s;
+}
+.data-table tbody tr:nth-child(even) { background: #fafbfc; }
+.data-table tbody tr:hover { background: #f0f5fb; }
+.data-table tbody td { padding: 10px 14px; vertical-align: middle; }
+.data-table tbody tr:last-child { border-bottom: none; }
+
+.compat-cell { display: flex; align-items: center; gap: 10px; min-width: 130px; }
+.compat-track { flex: 1; height: 5px; background: var(--border-soft); border-radius: 10px; overflow: hidden; }
+.compat-fill { height: 100%; border-radius: 10px; }
+.compat-fill.c-high  { background: var(--green-mid); }
+.compat-fill.c-mid   { background: var(--amber-mid); }
+.compat-fill.c-low   { background: var(--red-mid); }
+.compat-pct { font-weight: 700; font-size: 13px; min-width: 36px; color: var(--text); }
+
+.pill {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 2px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+.pill-high  { background: var(--green-bg);  color: var(--green);  border: 1px solid #b7e3ca; }
+.pill-mid   { background: var(--amber-bg);  color: var(--amber);  border: 1px solid #f3d898; }
+.pill-low   { background: var(--red-bg);    color: var(--red);    border: 1px solid #f5c4c4; }
+
+.gap-positive { color: var(--green);  font-weight: 700; }
+.gap-negative { color: var(--red);    font-weight: 700; }
+
+.trend { font-size: 12px; font-weight: 600; }
+.trend-up   { color: var(--green); }
+.trend-down { color: var(--red); }
+.trend-flat { color: var(--text-muted); }
+
+/* ─── CHARTS ──────────────────────────────────────── */
+.charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+
+.chart-block {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  background: #fafbfc;
+}
+
+.chart-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.chart-area { position: relative; height: 210px; }
+.chart-area.sm { height: 190px; display: flex; align-items: center; justify-content: center; }
+
+/* ─── MAP ─────────────────────────────────────────── */
+.map-wrap { display: flex; gap: 24px; align-items: flex-start; }
+
+.geo-grid { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.geo-row  { display: flex; gap: 6px; }
+
+.geo-cell {
+  flex: 1;
+  min-height: 58px;
+  border-radius: var(--radius);
+  padding: 9px 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.geo-cell.blank { background: transparent; border-color: transparent; }
+
+.geo-cell.level-high {
+  background: var(--green-bg);
+  border-color: #b7e3ca;
+  color: var(--green);
+}
+.geo-cell.level-mid {
+  background: var(--amber-bg);
+  border-color: #f3d898;
+  color: var(--amber);
+}
+.geo-cell.level-low {
+  background: var(--red-bg);
+  border-color: #f5c4c4;
+  color: var(--red);
+}
+.geo-cell.level-off {
+  background: var(--bg);
+  border-color: var(--border);
+  color: var(--text-light);
+}
+
+.geo-name  { font-size: 12px; }
+.geo-score { font-size: 17px; font-weight: 800; }
+.geo-off-label { font-size: 10.5px; font-weight: 500; }
+
+.map-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 0;
+  min-width: 140px;
+}
+
+.legend-row { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); }
+
+.legend-block {
+  width: 14px; height: 14px;
+  border-radius: 2px;
+  border: 1px solid transparent;
+  flex-shrink: 0;
+}
+.lb-high { background: var(--green-bg); border-color: #b7e3ca; }
+.lb-mid  { background: var(--amber-bg); border-color: #f3d898; }
+.lb-low  { background: var(--red-bg);   border-color: #f5c4c4; }
+.lb-off  { background: var(--bg);       border-color: var(--border); }
+
+.map-note {
+  font-size: 11px;
+  color: var(--text-light);
+  margin-top: 12px;
+  line-height: 1.7;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+
+/* ─── REPORT ──────────────────────────────────────── */
+.report-sec { margin-bottom: 24px; }
+.report-sec-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--navy);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.report-body { font-size: 13.5px; line-height: 1.9; color: var(--text); }
+
+.report-block {
+  border-right: 3px solid var(--border);
+  padding: 10px 14px;
+  margin: 12px 0;
+  font-size: 13px;
+  line-height: 1.8;
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+.report-block.info    { border-right-color: var(--navy-light); background: #f0f5fc; }
+.report-block.success { border-right-color: var(--green-mid);  background: var(--green-bg); }
+.report-block.warn    { border-right-color: var(--amber-mid);  background: var(--amber-bg); }
+
+.mini-table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 10px; }
+.mini-table th { background: var(--bg); padding: 7px 12px; text-align: right; font-weight: 700; color: var(--navy); border-bottom: 1px solid var(--border); }
+.mini-table td { padding: 7px 12px; border-bottom: 1px solid var(--border-soft); }
+.mini-table tr:last-child td { border-bottom: none; }
+
+/* ─── EXPLANATION ─────────────────────────────────── */
+.explanation {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-right: 3px solid var(--navy-light);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-top: 18px;
+}
+
+.explanation-title {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--navy);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.explanation-body {
+  font-size: 13.5px;
+  line-height: 1.95;
+  color: var(--text);
+}
+
+/* ─── FOOTER ──────────────────────────────────────── */
+footer {
+  background: var(--navy-dark);
+  border-top: 2px solid var(--gold);
+  color: rgba(255,255,255,0.45);
+  text-align: center;
+  padding: 14px 24px;
+  font-size: 11.5px;
+  letter-spacing: 0.3px;
+  margin-top: 30px;
+}
+
+/* ─── DIVIDER ─────────────────────────────────────── */
+.divider { height: 1px; background: var(--border-soft); margin: 20px 0; }
+
+/* ─── RESPONSIVE ──────────────────────────────────── */
+@media (max-width: 900px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .kpi-row { grid-template-columns: 1fr 1fr; }
+  .charts-grid { grid-template-columns: 1fr; }
+  .gov-list { grid-template-columns: repeat(3, 1fr); }
+  .page-header-inner { flex-direction: column; gap: 12px; }
+}
+@media (max-width: 600px) {
+  .nav-links { display: none; }
+  .kpi-row { grid-template-columns: 1fr 1fr; }
+  .gov-list { grid-template-columns: repeat(2, 1fr); }
+  .map-wrap { flex-direction: column; }
+  .navbar { padding: 0 16px; }
+  .main { padding: 18px 14px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <div class="nav-logo">JINDC</div>
+    <div>
+      <div class="nav-title">مركز البيانات الوطني التفاعلي</div>
+      <div class="nav-sub">Jordan Interactive National Data Center</div>
+    </div>
+  </div>
+  <div class="nav-links">
+    <button class="nav-link">الرئيسية</button>
+    <button class="nav-link">البيانات</button>
+    <button class="nav-link">التقارير</button>
+    <button class="nav-link active">النمذجة</button>
+    <button class="nav-link">لوحة البيانات</button>
+  </div>
+</nav>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb-bar">
+  <a href="#">الرئيسية</a>
+  <span>/</span>
+  <a href="#">النمذجة الإحصائية</a>
+  <span>/</span>
+  <span class="current">نموذج مالءمة المهن والتخصصات</span>
+</div>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <div class="page-title">نموذج مالءمة المهن والتخصصات</div>
+      <div class="page-desc">
+        تحليل العلاقة بين التخصصات التعليمية ومهن سوق العمل — يُظهر مستوى المالءمة، الفجوة، والنمو أو الفائض المتوقع في ضوء المدخلات المحددة.
+      </div>
+    </div>
+    <div class="page-access-badge">
+      <div class="access-dot"></div>
+      متاح لجميع زوار المنصة
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- ALERT -->
+  <div class="alert">
+    <strong>ملاحظة:</strong> هذا النموذج مبني على التنبؤ الإحصائي. دقة النتائج تتناسب عكسياً مع عدد سنوات التنبؤ المختارة. النتائج للأغراض التحليلية والاسترشادية فقط.
+  </div>
+
+  <!-- FORM CARD -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-head-title">مدخلات النموذج</div>
+    </div>
+    <div class="card-body">
+      <div class="form-grid">
+
+        <!-- SPECIALIZATIONS -->
+        <div class="form-field form-col-full">
+          <label class="form-label">
+            التخصصات <span class="req">*</span>
+            <span class="form-hint">(حد أدنى 2 — حد أقصى 5 تخصصات)</span>
+          </label>
+          <div class="ms-wrap" id="msWrap">
+            <div class="ms-box" id="msBox" onclick="toggleMs()">
+              <span class="ms-placeholder" id="msPlaceholder">اختر من القائمة...</span>
+              <svg class="ms-chevron" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M1 1l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="ms-panel" id="msPanel">
+              <div class="ms-search-row">
+                <input class="ms-search-input" type="text" id="msSearch" placeholder="بحث في التخصصات..." oninput="filterMs(this.value)">
+              </div>
+              <div class="ms-list" id="msList"></div>
+              <div class="ms-footer">
+                <span id="msCountLabel">0 مختار</span>
+                <span>الحد الأقصى 5 تخصصات</span>
+              </div>
+            </div>
+          </div>
+          <div class="field-err" id="errSpecs">يجب اختيار تخصصين على الأقل.</div>
+        </div>
+
+        <!-- YEAR -->
+        <div class="form-field">
+          <label class="form-label">
+            السنة الحالية
+            <span class="form-hint">(تلقائي)</span>
+          </label>
+          <div class="field-readonly" id="yearDisplay"></div>
+        </div>
+
+        <!-- GENDER -->
+        <div class="form-field">
+          <label class="form-label">الجنس <span class="req">*</span></label>
+          <div class="gender-group" id="genderGroup">
+            <label class="gender-option active" onclick="pickGender('all', this)">
+              <input type="radio" name="gender" value="all" checked> الكل
+            </label>
+            <label class="gender-option" onclick="pickGender('male', this)">
+              <input type="radio" name="gender" value="male"> ذكر
+            </label>
+            <label class="gender-option" onclick="pickGender('female', this)">
+              <input type="radio" name="gender" value="female"> أنثى
+            </label>
+          </div>
+        </div>
+
+        <!-- GOVERNORATES -->
+        <div class="form-field form-col-full">
+          <label class="form-label">المنطقة الجغرافية <span class="req">*</span></label>
+          <div class="gov-selector" id="govSelector">
+            <label class="gov-kingdom">
+              <input type="checkbox" id="kingdomAll" onchange="toggleAllGovs(this)">
+              المملكة كاملة — جميع المحافظات
+            </label>
+            <div class="gov-list" id="govList"></div>
+          </div>
+          <div class="field-err" id="errGov">يجب اختيار محافظة واحدة على الأقل أو المملكة كاملة.</div>
+        </div>
+
+        <!-- FORECAST YEARS -->
+        <div class="form-field">
+          <label class="form-label">عدد سنوات التنبؤ <span class="req">*</span></label>
+          <select class="form-select" id="forecastYrs">
+            <option value="">اختر عدد السنوات</option>
+            <option value="1">سنة واحدة</option>
+            <option value="2">سنتان</option>
+            <option value="3" selected>3 سنوات</option>
+            <option value="4">4 سنوات</option>
+            <option value="5">5 سنوات</option>
+            <option value="6">6 سنوات</option>
+            <option value="7">7 سنوات</option>
+          </select>
+          <div class="field-err" id="errYears">يجب تحديد عدد سنوات التنبؤ.</div>
+        </div>
+
+        <!-- BUTTONS -->
+        <div class="form-field form-col-full">
+          <div class="divider"></div>
+          <div class="btn-row">
+            <button type="button" class="btn btn-primary" onclick="runModel()">تنفيذ النموذج</button>
+            <button type="button" class="btn btn-outline" onclick="resetAll()">إلغاء</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results">
+
+    <!-- KPI ROW -->
+    <div class="kpi-row" id="kpiRow"></div>
+
+    <!-- RESULTS CARD -->
+    <div class="card">
+      <div class="tab-nav" id="tabNav">
+        <button class="tab-btn active" onclick="switchTab('table', this)">جدول النتائج</button>
+        <button class="tab-btn" onclick="switchTab('charts', this)">الرسوم البيانية</button>
+        <button class="tab-btn" onclick="switchTab('map', this)">الخريطة الجغرافية</button>
+        <button class="tab-btn" onclick="switchTab('report', this)">التقرير</button>
+      </div>
+
+      <!-- TABLE -->
+      <div class="tab-pane active" id="tab-table">
+        <div style="overflow-x:auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>التخصص</th>
+                <th>القطاع</th>
+                <th>نسبة المالءمة</th>
+                <th>مستوى الطلب</th>
+                <th>العرض الحالي</th>
+                <th>الطلب الحالي</th>
+                <th>الفجوة المتوقعة</th>
+                <th>اتجاه النمو</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CHARTS -->
+      <div class="tab-pane" id="tab-charts">
+        <div class="charts-grid">
+          <div class="chart-block">
+            <div class="chart-label">نسبة المالءمة بين التخصصات والمهن</div>
+            <div class="chart-area"><canvas id="ch1"></canvas></div>
+          </div>
+          <div class="chart-block">
+            <div class="chart-label">توقعات الطلب على الكوادر (بالألف)</div>
+            <div class="chart-area"><canvas id="ch2"></canvas></div>
+          </div>
+          <div class="chart-block">
+            <div class="chart-label">العرض مقابل الطلب الحالي</div>
+            <div class="chart-area"><canvas id="ch3"></canvas></div>
+          </div>
+          <div class="chart-block">
+            <div class="chart-label">توزيع التخصصات حسب مستوى المالءمة</div>
+            <div class="chart-area sm"><canvas id="ch4" style="max-height:185px;"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAP -->
+      <div class="tab-pane" id="tab-map">
+        <div style="font-size:12.5px;color:var(--text-muted);margin-bottom:16px;">
+          يُظهر الجدول الجغرافي توزيع مستوى الطلب على التخصصات المختارة في المحافظات المحددة. البيانات مبنية على مسح قوة العمل والسجلات الإدارية.
+        </div>
+        <div class="map-wrap">
+          <div class="geo-grid" id="geoGrid"></div>
+          <div class="map-legend">
+            <div style="font-size:11.5px;font-weight:800;color:var(--text);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">مستوى الطلب</div>
+            <div class="legend-row"><div class="legend-block lb-high"></div> مرتفع (أكثر من 75%)</div>
+            <div class="legend-row"><div class="legend-block lb-mid"></div> متوسط (50 — 75%)</div>
+            <div class="legend-row"><div class="legend-block lb-low"></div> منخفض (أقل من 50%)</div>
+            <div class="legend-row"><div class="legend-block lb-off"></div> خارج نطاق الاختيار</div>
+            <div class="map-note">النسبة تمثل متوسط<br>مستوى الطلب لجميع<br>التخصصات المختارة<br>في كل محافظة.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REPORT -->
+      <div class="tab-pane" id="tab-report">
+        <div id="reportBody"></div>
+      </div>
+
+    </div>
+
+    <!-- EXPLANATION -->
+    <div class="explanation" id="explanationBox">
+      <div class="explanation-title">الشرح والتفسير النصي للنتائج</div>
+      <div class="explanation-body" id="explanationText"></div>
+    </div>
+
+  </div><!-- /results -->
+
+</div><!-- /main -->
+
+<!-- LOADING -->
+<div class="loading-mask" id="loadingMask">
+  <div class="spinner"></div>
+  <div class="loading-msg">جارٍ تشغيل النموذج</div>
+  <div class="loading-sub">يتم معالجة البيانات واحتساب المؤشرات...</div>
+</div>
+
+<footer>
+  مركز البيانات الوطني التفاعلي &nbsp;&mdash;&nbsp; دائرة الإحصاءات العامة &nbsp;&mdash;&nbsp; نموذج مالءمة المهن والتخصصات &nbsp;&mdash;&nbsp; نسخة تجريبية
+</footer>
+
+<script>
+/* ════════════════════════════════════════════
+   DATA
+════════════════════════════════════════════ */
+const SPECS = [
+  { id:1,  name:'هندسة الحاسوب والمعلومات',       sector:'تكنولوجيا المعلومات',  compat:88, supply:4200, demand:5800, trend:1 },
+  { id:2,  name:'إدارة الأعمال',                   sector:'إدارة وأعمال',          compat:71, supply:9400, demand:7600, trend:0 },
+  { id:3,  name:'الطب البشري',                     sector:'الصحة',                 compat:94, supply:1800, demand:2900, trend:1 },
+  { id:4,  name:'القانون',                         sector:'خدمات قانونية',         compat:62, supply:6700, demand:5100, trend:-1 },
+  { id:5,  name:'الهندسة المدنية',                 sector:'الإنشاء والبناء',       compat:79, supply:3800, demand:4400, trend:1 },
+  { id:6,  name:'علم النفس',                       sector:'الصحة النفسية',         compat:55, supply:5200, demand:3800, trend:0 },
+  { id:7,  name:'المحاسبة والمالية',               sector:'المالية',               compat:83, supply:7100, demand:8200, trend:1 },
+  { id:8,  name:'الصيدلة',                         sector:'الصحة',                 compat:87, supply:2600, demand:3500, trend:1 },
+  { id:9,  name:'اللغة الإنجليزية وآدابها',        sector:'التعليم',               compat:58, supply:8300, demand:5900, trend:-1 },
+  { id:10, name:'التمريض',                         sector:'الصحة',                 compat:91, supply:3100, demand:5200, trend:1 },
+  { id:11, name:'علوم الحاسوب',                    sector:'تكنولوجيا المعلومات',  compat:85, supply:3900, demand:5300, trend:1 },
+  { id:12, name:'الاقتصاد',                        sector:'الاقتصاد',              compat:67, supply:4600, demand:4100, trend:0 },
+  { id:13, name:'الهندسة الكهربائية',              sector:'الهندسة',               compat:82, supply:2900, demand:3800, trend:1 },
+  { id:14, name:'الصحافة والإعلام',                sector:'الإعلام',               compat:48, supply:7200, demand:4300, trend:-1 },
+  { id:15, name:'العلوم الطبية المساندة',          sector:'الصحة',                 compat:89, supply:2400, demand:3800, trend:1 },
+  { id:16, name:'الهندسة الميكانيكية',             sector:'الهندسة',               compat:76, supply:3300, demand:3700, trend:0 },
+  { id:17, name:'التربية والتعليم',                sector:'التعليم',               compat:69, supply:11200,demand:9500, trend:0 },
+  { id:18, name:'الكيمياء',                        sector:'العلوم',                compat:64, supply:3900, demand:3300, trend:0 },
+  { id:19, name:'الرياضيات والإحصاء',             sector:'العلوم',                compat:72, supply:3100, demand:3600, trend:1 },
+  { id:20, name:'الذكاء الاصطناعي وعلم البيانات', sector:'تكنولوجيا المعلومات',  compat:93, supply:800,  demand:3200, trend:1 },
+  { id:21, name:'الفندقة والسياحة',                sector:'السياحة',               compat:59, supply:5800, demand:4200, trend:-1 },
+  { id:22, name:'العمارة والتصميم الداخلي',        sector:'الإنشاء والبناء',       compat:70, supply:3200, demand:3100, trend:0 },
+  { id:23, name:'الأمن السيبراني',                 sector:'تكنولوجيا المعلومات',  compat:92, supply:600,  demand:2800, trend:1 },
+  { id:24, name:'إدارة المستشفيات',                sector:'الصحة',                 compat:78, supply:1900, demand:2400, trend:1 },
+  { id:25, name:'الفيزياء',                        sector:'العلوم',                compat:53, supply:2800, demand:2100, trend:0 },
+];
+
+const GOVS = [
+  { id:'amman',  name:'عمّان',    w:1.00 },
+  { id:'irbid',  name:'إربد',     w:0.85 },
+  { id:'zarqa',  name:'الزرقاء',  w:0.82 },
+  { id:'balqa',  name:'البلقاء',  w:0.70 },
+  { id:'karak',  name:'الكرك',    w:0.62 },
+  { id:'mafraq', name:'المفرق',   w:0.58 },
+  { id:'aqaba',  name:'العقبة',   w:0.68 },
+  { id:'jarash', name:'جرش',     w:0.55 },
+  { id:'ajloun', name:'عجلون',    w:0.52 },
+  { id:'madaba', name:'مادبا',    w:0.60 },
+  { id:'tafila', name:'الطفيلة',  w:0.48 },
+  { id:'maan',   name:'معان',     w:0.50 },
+];
+
+// Approximate geographic layout [row, col] in 7×4 grid
+const GEO = {
+  mafraq:[0,2], ajloun:[1,0], irbid:[1,1], jarash:[1,2],
+  balqa:[2,0],  amman:[2,1],  zarqa:[2,2],
+  madaba:[3,0], karak:[3,1],
+  tafila:[4,1],
+  maan:[5,1],
+  aqaba:[6,1],
+};
+
+/* ════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════ */
+let sel    = [];
+let govSel = [];
+let gender = 'all';
+let msOpen = false;
+let chInst = {};
+
+/* ════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('yearDisplay').textContent = new Date().getFullYear();
+  buildMsList();
+  buildGovList();
+  document.addEventListener('click', e => {
+    if (msOpen && !document.getElementById('msWrap').contains(e.target)) closeMs();
+  });
+});
+
+/* ════════════════════════════════════════════
+   MULTI-SELECT
+════════════════════════════════════════════ */
+function buildMsList(q = '') {
+  const list = document.getElementById('msList');
+  list.innerHTML = '';
+  const filtered = SPECS.filter(s =>
+    !q || s.name.includes(q) || s.sector.includes(q)
+  );
+  if (!filtered.length) {
+    list.innerHTML = '<div class="ms-empty">لا توجد نتائج مطابقة</div>';
+    return;
+  }
+  filtered.forEach(s => {
+    const checked  = sel.includes(s.id);
+    const disabled = !checked && sel.length >= 5;
+    const el = document.createElement('label');
+    el.className = 'ms-item' + (disabled ? ' disabled' : '');
+    el.innerHTML = `<input type="checkbox" ${checked?'checked':''} ${disabled?'disabled':''} onchange="toggleSpec(${s.id},this)">
+      <span>${s.name} <span class="ms-item-sub">— ${s.sector}</span></span>`;
+    list.appendChild(el);
+  });
+}
+
+function toggleMs() {
+  msOpen = !msOpen;
+  document.getElementById('msBox').classList.toggle('open', msOpen);
+  document.getElementById('msPanel').classList.toggle('open', msOpen);
+  if (msOpen) document.getElementById('msSearch').focus();
+}
+
+function closeMs() {
+  msOpen = false;
+  document.getElementById('msBox').classList.remove('open');
+  document.getElementById('msPanel').classList.remove('open');
+}
+
+function filterMs(v) { buildMsList(v); }
+
+function toggleSpec(id, cb) {
+  if (cb.checked) {
+    if (sel.length >= 5) { cb.checked = false; return; }
+    sel.push(id);
+  } else {
+    sel = sel.filter(x => x !== id);
+  }
+  refreshTags();
+  buildMsList(document.getElementById('msSearch').value);
+}
+
+function refreshTags() {
+  const box  = document.getElementById('msBox');
+  const ph   = document.getElementById('msPlaceholder');
+  const cnt  = document.getElementById('msCountLabel');
+  const svg  = box.querySelector('svg');
+  box.querySelectorAll('.ms-tag').forEach(t => t.remove());
+  ph.style.display = sel.length ? 'none' : '';
+  sel.forEach(id => {
+    const s = SPECS.find(x => x.id === id);
+    const tag = document.createElement('span');
+    tag.className = 'ms-tag';
+    tag.innerHTML = `${s.name}<button class="ms-tag-remove" type="button" onclick="removeSpec(${id},event)">&times;</button>`;
+    box.insertBefore(tag, svg);
+  });
+  cnt.textContent = `${sel.length} مختار`;
+}
+
+function removeSpec(id, e) {
+  e.stopPropagation();
+  sel = sel.filter(x => x !== id);
+  refreshTags();
+  buildMsList(document.getElementById('msSearch').value);
+}
+
+/* ════════════════════════════════════════════
+   GOVERNORATES
+════════════════════════════════════════════ */
+function buildGovList() {
+  const list = document.getElementById('govList');
+  GOVS.forEach(g => {
+    const lbl = document.createElement('label');
+    lbl.className = 'gov-option';
+    lbl.dataset.id = g.id;
+    lbl.innerHTML = `<input type="checkbox" value="${g.id}" onchange="updateGovSel()"> ${g.name}`;
+    list.appendChild(lbl);
+  });
+}
+
+function toggleAllGovs(cb) {
+  document.querySelectorAll('#govList input').forEach(b => {
+    b.checked = cb.checked;
+    b.closest('label').classList.toggle('active', cb.checked);
+  });
+  govSel = cb.checked ? GOVS.map(g => g.id) : [];
+}
+
+function updateGovSel() {
+  const checked = document.querySelectorAll('#govList input:checked');
+  govSel = Array.from(checked).map(b => b.value);
+  document.querySelectorAll('#govList label').forEach(l => {
+    l.classList.toggle('active', l.querySelector('input').checked);
+  });
+  document.getElementById('kingdomAll').checked = govSel.length === GOVS.length;
+}
+
+function pickGender(val, el) {
+  gender = val;
+  document.querySelectorAll('.gender-option').forEach(g => g.classList.remove('active'));
+  el.classList.add('active');
+}
+
+/* ════════════════════════════════════════════
+   VALIDATION
+════════════════════════════════════════════ */
+function validate() {
+  let ok = true;
+  const mark = (errId, ctrlId, fail) => {
+    document.getElementById(errId).classList.toggle('show', fail);
+    if (ctrlId) document.getElementById(ctrlId)?.classList.toggle('has-error', fail);
+    if (fail) ok = false;
+  };
+  mark('errSpecs', 'msBox',          sel.length < 2);
+  mark('errGov',   'govSelector',    govSel.length === 0);
+  mark('errYears', 'forecastYrs',    !document.getElementById('forecastYrs').value);
+  return ok;
+}
+
+/* ════════════════════════════════════════════
+   MODEL EXECUTION
+════════════════════════════════════════════ */
+function runModel() {
+  if (!validate()) {
+    document.querySelector('.field-err.show')?.scrollIntoView({ behavior:'smooth', block:'center' });
+    return;
+  }
+  document.getElementById('loadingMask').classList.add('show');
+  setTimeout(() => {
+    document.getElementById('loadingMask').classList.remove('show');
+    const data = compute();
+    paint(data);
+    const res = document.getElementById('results');
+    res.classList.add('show');
+    res.scrollIntoView({ behavior:'smooth', block:'start' });
+  }, 2200);
+}
+
+/* ════════════════════════════════════════════
+   COMPUTE (SIMULATED)
+════════════════════════════════════════════ */
+function compute() {
+  const yrs      = parseInt(document.getElementById('forecastYrs').value) || 3;
+  const gwAvg    = govSel.length ? govSel.reduce((s,id) => s+(GOVS.find(g=>g.id===id)?.w||1),0)/govSel.length : 1;
+  const gFactor  = gender === 'all' ? 1 : 0.52;
+  const baseYear = new Date().getFullYear();
+
+  const specs = sel.map(id => {
+    const s = SPECS.find(x => x.id === id);
+    const noise = () => (Math.random()-0.5)*6;
+    const c  = Math.min(100, Math.max(20, Math.round(s.compat + noise())));
+    const su = Math.round(s.supply * gwAvg * gFactor);
+    const de = Math.round(s.demand * gwAvg * gFactor);
+    return { ...s, compat:c, supply:su, demand:de, gap:de-su };
+  });
+
+  const yearLabels = Array.from({length:yrs+1},(_,i)=>(baseYear+i).toString());
+
+  const forecast = specs.map(s => {
+    const pts = [s.demand];
+    for (let i=1;i<=yrs;i++) {
+      const r = s.trend===1 ? 1.07 : s.trend===-1 ? 0.94 : 1.02;
+      pts.push(Math.round(pts[pts.length-1]*r*(1+(Math.random()-0.5)*0.035)));
+    }
+    return pts;
+  });
+
+  const mapScores = {};
+  GOVS.forEach(g => {
+    if (govSel.includes(g.id)) {
+      const base = specs.reduce((s,sp)=>s+sp.compat,0)/specs.length;
+      mapScores[g.id] = Math.min(100,Math.max(20,Math.round(base*g.w+(Math.random()-0.5)*10)));
+    }
+  });
+
+  return { specs, yearLabels, forecast, yrs, mapScores };
+}
+
+/* ════════════════════════════════════════════
+   PAINT RESULTS
+════════════════════════════════════════════ */
+function paint(data) {
+  paintKPIs(data);
+  paintTable(data);
+  paintCharts(data);
+  paintMap(data);
+  paintReport(data);
+  paintExplanation(data);
+}
+
+/* KPIs */
+function paintKPIs({ specs }) {
+  const avg   = Math.round(specs.reduce((s,sp)=>s+sp.compat,0)/specs.length);
+  const gap   = specs.reduce((s,sp)=>s+sp.gap,0);
+  const best  = specs.reduce((a,b)=>a.compat>b.compat?a:b);
+  const worst = specs.reduce((a,b)=>a.compat<b.compat?a:b);
+
+  const cls = v => v>=75?'green':v>=55?'amber':'red';
+
+  document.getElementById('kpiRow').innerHTML = [
+    { label:'متوسط نسبة المالءمة',   value:avg+'%',      color:cls(avg),                        meta:'للتخصصات المختارة' },
+    { label:'الفجوة الكلية المتوقعة', value:fmtn(Math.abs(gap)), color:gap>0?'green':'red', meta:gap>0?'وظيفة — نقص في الكوادر':'وظيفة — فائض في الكوادر' },
+    { label:'التخصص الأعلى مالءمة',  value:best.compat+'%',  color:'green',                 meta:best.name },
+    { label:'التخصص الأدنى مالءمة',  value:worst.compat+'%', color:cls(worst.compat),       meta:worst.name },
+  ].map(k => `<div class="kpi ${k.color}">
+    <div class="kpi-label">${k.label}</div>
+    <div class="kpi-value ${k.color}">${k.value}</div>
+    <div class="kpi-meta">${k.meta}</div>
+  </div>`).join('');
+}
+
+/* Table */
+function paintTable({ specs }) {
+  document.getElementById('tableBody').innerHTML = specs.map((s,i) => {
+    const lvl  = s.compat>=75?'high':s.compat>=55?'mid':'low';
+    const ltxt = s.compat>=75?'مرتفع':s.compat>=55?'متوسط':'منخفض';
+    const tHtml = s.trend===1
+      ? '<span class="trend trend-up">نمو +</span>'
+      : s.trend===-1
+        ? '<span class="trend trend-down">تراجع -</span>'
+        : '<span class="trend trend-flat">مستقر</span>';
+    const gClass = s.gap>0?'gap-positive':'gap-negative';
+    return `<tr>
+      <td style="color:var(--text-light);font-weight:600">${i+1}</td>
+      <td><strong>${s.name}</strong></td>
+      <td style="font-size:12px;color:var(--text-muted)">${s.sector}</td>
+      <td>
+        <div class="compat-cell">
+          <div class="compat-track"><div class="compat-fill c-${lvl}" style="width:${s.compat}%"></div></div>
+          <span class="compat-pct">${s.compat}%</span>
+        </div>
+      </td>
+      <td><span class="pill pill-${lvl}">${ltxt}</span></td>
+      <td>${fmtn(s.supply)}</td>
+      <td>${fmtn(s.demand)}</td>
+      <td class="${gClass}">${s.gap>0?'+':''}${fmtn(s.gap)}</td>
+      <td>${tHtml}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* Charts */
+function paintCharts({ specs, forecast, yearLabels }) {
+  Object.values(chInst).forEach(c => c.destroy());
+  chInst = {};
+
+  const PAL = ['#1b3a5c','#2d7a4f','#92600a','#6b46c1','#9b2c2c','#276749','#1a6bb5','#2d5986'];
+  const muted = v => v+'cc';
+
+  // Compatibility bar
+  chInst.c1 = new Chart(document.getElementById('ch1'), {
+    type:'bar',
+    data:{
+      labels: specs.map(s => s.name.length>18?s.name.slice(0,16)+'…':s.name),
+      datasets:[{
+        data: specs.map(s => s.compat),
+        backgroundColor: specs.map(s => s.compat>=75?'#c6e8d6':s.compat>=55?'#fce8c0':'#f8d0d0'),
+        borderColor:     specs.map(s => s.compat>=75?'#2d7a4f':s.compat>=55?'#92600a':'#9b2c2c'),
+        borderWidth:1, borderRadius:2,
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        y:{ beginAtZero:true, max:100, grid:{color:'#eceff4'}, ticks:{font:{size:11}} },
+        x:{ grid:{display:false}, ticks:{font:{size:11}} }
+      }
+    }
+  });
+
+  // Forecast line
+  chInst.c2 = new Chart(document.getElementById('ch2'), {
+    type:'line',
+    data:{
+      labels: yearLabels,
+      datasets: specs.map((s,i) => ({
+        label: s.name.length>14?s.name.slice(0,12)+'…':s.name,
+        data: forecast[i].map(v => +(v/1000).toFixed(1)),
+        borderColor: PAL[i%PAL.length],
+        backgroundColor: 'transparent',
+        tension:.35, pointRadius:3, borderWidth:2,
+      }))
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:10,padding:10}}},
+      scales:{
+        y:{ grid:{color:'#eceff4'}, ticks:{font:{size:11}} },
+        x:{ grid:{display:false}, ticks:{font:{size:11}} }
+      }
+    }
+  });
+
+  // Supply vs Demand
+  chInst.c3 = new Chart(document.getElementById('ch3'), {
+    type:'bar',
+    data:{
+      labels: specs.map(s => s.name.length>14?s.name.slice(0,12)+'…':s.name),
+      datasets:[
+        { label:'العرض', data:specs.map(s=>s.supply), backgroundColor:'#bed8f7', borderColor:'#2d5986', borderWidth:1, borderRadius:2 },
+        { label:'الطلب', data:specs.map(s=>s.demand), backgroundColor:'#c6e8d6', borderColor:'#2d7a4f', borderWidth:1, borderRadius:2 },
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:10,padding:10}}},
+      scales:{
+        y:{ grid:{color:'#eceff4'}, ticks:{font:{size:11}} },
+        x:{ grid:{display:false}, ticks:{font:{size:11}} }
+      }
+    }
+  });
+
+  // Doughnut
+  const hi = specs.filter(s=>s.compat>=75).length;
+  const md = specs.filter(s=>s.compat>=55&&s.compat<75).length;
+  const lo = specs.filter(s=>s.compat<55).length;
+  chInst.c4 = new Chart(document.getElementById('ch4'), {
+    type:'doughnut',
+    data:{
+      labels:['مالءمة مرتفعة','مالءمة متوسطة','مالءمة منخفضة'],
+      datasets:[{ data:[hi,md,lo], backgroundColor:['#2d7a4f','#d69e2e','#c53030'], borderWidth:2, borderColor:'#fff' }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:11},boxWidth:10,padding:10}}}
+    }
+  });
+}
+
+/* Map */
+function paintMap({ mapScores }) {
+  const grid = document.getElementById('geoGrid');
+  grid.innerHTML = '';
+  const ROWS=7, COLS=4;
+  const cells = Array.from({length:ROWS},()=>Array(COLS).fill(null));
+  GOVS.forEach(g => { const p=GEO[g.id]; if(p) cells[p[0]][p[1]]=g; });
+
+  cells.forEach(row => {
+    const rowEl = document.createElement('div');
+    rowEl.className = 'geo-row';
+    row.forEach(g => {
+      const cell = document.createElement('div');
+      if (!g) {
+        cell.className = 'geo-cell blank';
+      } else if (!govSel.includes(g.id)) {
+        cell.className = 'geo-cell level-off';
+        cell.innerHTML = `<span class="geo-name">${g.name}</span><span class="geo-off-label">—</span>`;
+      } else {
+        const sc  = mapScores[g.id] || 50;
+        const lvl = sc>=75?'high':sc>=50?'mid':'low';
+        cell.className = `geo-cell level-${lvl}`;
+        cell.innerHTML = `<span class="geo-name">${g.name}</span><span class="geo-score">${sc}%</span>`;
+        cell.title = `${g.name} — مستوى الطلب: ${sc}%`;
+      }
+      rowEl.appendChild(cell);
+    });
+    grid.appendChild(rowEl);
+  });
+}
+
+/* Report */
+function paintReport({ specs, yrs }) {
+  const avg   = Math.round(specs.reduce((s,sp)=>s+sp.compat,0)/specs.length);
+  const best  = [...specs].sort((a,b)=>b.compat-a.compat)[0];
+  const worst = [...specs].sort((a,b)=>a.compat-b.compat)[0];
+  const yr    = new Date().getFullYear();
+  const gLbl  = gender==='all'?'كلا الجنسين':gender==='male'?'الذكور':'الإناث';
+  const gvLbl = govSel.length===GOVS.length ? 'المملكة كاملة' : GOVS.filter(g=>govSel.includes(g.id)).map(g=>g.name).join('، ');
+
+  document.getElementById('reportBody').innerHTML = `
+    <div class="report-sec">
+      <div class="report-sec-title">ملخص تنفيذي</div>
+      <div class="report-body">
+        تم تنفيذ النموذج لتحليل مستوى المالءمة بين <strong>${specs.length} تخصصات</strong> تعليمية وسوق العمل
+        في <strong>${gvLbl}</strong>، لفئة <strong>${gLbl}</strong>، بأفق تنبؤي مدته
+        <strong>${yrs} ${yrs===1?'سنة':'سنوات'}</strong> (${yr}–${yr+yrs}).
+      </div>
+      <div class="report-block ${avg>=75?'success':avg>=55?'info':'warn'}">
+        متوسط نسبة المالءمة الكلية: <strong>${avg}%</strong>
+        ${avg>=75?' — توافق جيد بين مخرجات التعليم العالي واحتياجات سوق العمل.':avg>=55?' — توافق متوسط يستدعي مراجعة بعض التخصصات.':' — ضعف في التوافق يستدعي تدخلاً في السياسات التعليمية.'}
+      </div>
+    </div>
+    <div class="report-sec">
+      <div class="report-sec-title">نتائج التخصصات</div>
+      <table class="mini-table">
+        <thead><tr><th>التخصص</th><th>القطاع</th><th>المالءمة</th><th>الفجوة</th><th>التوقع</th></tr></thead>
+        <tbody>${specs.map(s=>`<tr>
+          <td><strong>${s.name}</strong></td>
+          <td style="font-size:12px;color:var(--text-muted)">${s.sector}</td>
+          <td style="font-weight:700;color:${s.compat>=75?'var(--green)':s.compat>=55?'var(--amber)':'var(--red)'}">${s.compat}%</td>
+          <td style="font-weight:700;color:${s.gap>0?'var(--green)':'var(--red)'}">${s.gap>0?'+':''}${fmtn(s.gap)}</td>
+          <td style="font-size:12px">${s.trend===1?'نمو':s.trend===-1?'تراجع':'مستقر'}</td>
+        </tr>`).join('')}</tbody>
+      </table>
+    </div>
+    <div class="report-sec">
+      <div class="report-sec-title">أبرز الملاحظات</div>
+      <div class="report-body">
+        <div class="report-block success">
+          <strong>الأعلى مالءمة:</strong> ${best.name} — ${best.compat}%<br>
+          توافق قوي مع احتياجات قطاع ${best.sector}.
+        </div>
+        <div class="report-block ${worst.compat<60?'warn':'info'}">
+          <strong>الأدنى مالءمة:</strong> ${worst.name} — ${worst.compat}%<br>
+          ${worst.compat<60?'يُوصى بمراجعة المناهج وسياسات القبول وربطها بمتطلبات سوق العمل الفعلية.':'فجوة مقبولة مع إمكانية تحسين التوافق.'}
+        </div>
+        ${specs.filter(s=>s.compat<60).length?`<div class="report-block warn">
+          ${specs.filter(s=>s.compat<60).length} تخصص دون مستوى المالءمة المقبول (60%) — يُنصح بمراجعة سياسات الالتحاق وتعزيز الربط بمتطلبات السوق.
+        </div>`:''}
+      </div>
+    </div>
+    <div class="report-sec">
+      <div class="report-sec-title">مصادر البيانات</div>
+      <div class="report-body" style="line-height:2;font-size:13px;color:var(--text-muted)">
+        مسح قوة العمل — دائرة الإحصاءات العامة<br>
+        مسح فرص العمل — وزارة العمل<br>
+        بيانات التعليم العالي — وزارة التعليم العالي والبحث العلمي<br>
+        الملفات والمعادلات المزودة من قسم النمذجة ودعم القرار
+      </div>
+    </div>`;
+}
+
+/* Explanation */
+function paintExplanation({ specs, yrs }) {
+  const avg     = Math.round(specs.reduce((s,sp)=>s+sp.compat,0)/specs.length);
+  const grow    = specs.filter(s=>s.trend===1).map(s=>s.name);
+  const decline = specs.filter(s=>s.trend===-1).map(s=>s.name);
+  const pos     = specs.filter(s=>s.gap>0).map(s=>s.name);
+  const neg     = specs.filter(s=>s.gap<0).map(s=>s.name);
+
+  let txt = `تُشير نتائج النموذج إلى أن متوسط مستوى المالءمة بين التخصصات المختارة ومهن سوق العمل يبلغ <strong>${avg}%</strong>`;
+  txt += avg>=75?'، وهو مستوى مرتفع يعكس توافقاً جيداً بين مخرجات التعليم العالي واحتياجات سوق العمل.'
+       :avg>=55?'، وهو مستوى متوسط يستدعي مراجعة بعض التخصصات وتعزيز ربطها بمتطلبات السوق.'
+       :'، وهو مستوى منخفض يستدعي تدخلاً في سياسات التعليم والتوجيه المهني.';
+
+  if (pos.length) txt += `<br><br>تُسجّل تخصصات <strong>${pos.join(' و')}</strong> فجوةً إيجابية — الطلب يتجاوز العرض، مما يُنبئ بشُح في الكوادر خلال سنوات التنبؤ القادمة.`;
+  if (neg.length) txt += `<br><br>في المقابل، تُسجل تخصصات <strong>${neg.join(' و')}</strong> فائضاً في الكوادر — عدد الخريجين يتخطى الطلب الفعلي، وقد يُفضي إلى ارتفاع في نسب التعطل لهذه التخصصات.`;
+  if (grow.length) txt += `<br><br>يُتوقع نمو ملحوظ في الطلب على تخصصات <strong>${grow.join(' و')}</strong> خلال الـ ${yrs} سنوات القادمة، مما يوصي برفع أعداد القبول وجاهزية الكوادر.`;
+  if (decline.length) txt += `<br><br>يُتوقع تراجع الطلب على تخصصات <strong>${decline.join(' و')}</strong>، مما يستدعي إعادة النظر في سياسات القبول والتوجيه نحو تخصصات أكثر توافقاً مع متطلبات السوق.`;
+
+  document.getElementById('explanationText').innerHTML = txt;
+}
+
+/* ════════════════════════════════════════════
+   TABS
+════════════════════════════════════════════ */
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ════════════════════════════════════════════
+   RESET
+════════════════════════════════════════════ */
+function resetAll() {
+  sel = []; govSel = []; gender = 'all';
+  refreshTags();
+  buildMsList('');
+  document.getElementById('msSearch').value = '';
+  document.querySelectorAll('#govList input').forEach(cb => { cb.checked=false; cb.closest('label').classList.remove('active'); });
+  document.getElementById('kingdomAll').checked = false;
+  document.querySelectorAll('.gender-option').forEach((g,i)=>{ g.classList.toggle('active',i===0); g.querySelector('input').checked=i===0; });
+  document.getElementById('forecastYrs').value = '3';
+  document.querySelectorAll('.field-err').forEach(e=>e.classList.remove('show'));
+  document.querySelectorAll('.has-error').forEach(e=>e.classList.remove('has-error'));
+  document.getElementById('results').classList.remove('show');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ════════════════════════════════════════════
+   UTILS
+════════════════════════════════════════════ */
+function fmtn(n) { return Math.abs(n).toLocaleString('ar-JO'); }
+</script>
+</body>
+</html>
