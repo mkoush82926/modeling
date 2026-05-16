@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>نموذج مالءمة المهن والتخصصات — مركز البيانات الوطني التفاعلي</title>
+<title>نموذج ملاءمة المهن والتخصصات — مركز البيانات الوطني التفاعلي</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
@@ -919,16 +919,16 @@ footer {
   <span>/</span>
   <a href="#">النمذجة الإحصائية</a>
   <span>/</span>
-  <span class="current">نموذج مالءمة المهن والتخصصات</span>
+  <span class="current">نموذج ملاءمة المهن والتخصصات</span>
 </div>
 
 <!-- PAGE HEADER -->
 <div class="page-header">
   <div class="page-header-inner">
     <div>
-      <div class="page-title">نموذج مالءمة المهن والتخصصات</div>
+      <div class="page-title">نموذج ملاءمة المهن والتخصصات</div>
       <div class="page-desc">
-        تحليل العلاقة بين التخصصات التعليمية ومهن سوق العمل — يُظهر مستوى المالءمة، الفجوة، والنمو أو الفائض المتوقع في ضوء المدخلات المحددة.
+        تحليل العلاقة بين التخصصات التعليمية ومهن سوق العمل — يُظهر مستوى الملاءمة، الفجوة، والنمو أو الفائض المتوقع في ضوء المدخلات المحددة.
       </div>
     </div>
     <div class="page-access-badge">
@@ -1072,7 +1072,7 @@ footer {
                 <th>#</th>
                 <th>التخصص</th>
                 <th>القطاع</th>
-                <th>نسبة المالءمة</th>
+                <th>نسبة الملاءمة</th>
                 <th>مستوى الطلب</th>
                 <th>العرض الحالي</th>
                 <th>الطلب الحالي</th>
@@ -1089,7 +1089,7 @@ footer {
       <div class="tab-pane" id="tab-charts">
         <div class="charts-grid">
           <div class="chart-block">
-            <div class="chart-label">نسبة المالءمة بين التخصصات والمهن</div>
+            <div class="chart-label">نسبة الملاءمة بين التخصصات والمهن</div>
             <div class="chart-area"><canvas id="ch1"></canvas></div>
           </div>
           <div class="chart-block">
@@ -1101,7 +1101,7 @@ footer {
             <div class="chart-area"><canvas id="ch3"></canvas></div>
           </div>
           <div class="chart-block">
-            <div class="chart-label">توزيع التخصصات حسب مستوى المالءمة</div>
+            <div class="chart-label">توزيع التخصصات حسب مستوى الملاءمة</div>
             <div class="chart-area sm"><canvas id="ch4" style="max-height:185px;"></canvas></div>
           </div>
         </div>
@@ -1150,7 +1150,7 @@ footer {
 </div>
 
 <footer>
-  مركز البيانات الوطني التفاعلي &nbsp;&mdash;&nbsp; دائرة الإحصاءات العامة &nbsp;&mdash;&nbsp; نموذج مالءمة المهن والتخصصات &nbsp;&mdash;&nbsp; نسخة تجريبية
+  مركز البيانات الوطني التفاعلي &nbsp;&mdash;&nbsp; دائرة الإحصاءات العامة &nbsp;&mdash;&nbsp; نموذج ملاءمة المهن والتخصصات &nbsp;&mdash;&nbsp; نسخة تجريبية
 </footer>
 
 <script>
@@ -1439,10 +1439,10 @@ function paintKPIs({ specs }) {
   const cls = v => v>=75?'green':v>=55?'amber':'red';
 
   document.getElementById('kpiRow').innerHTML = [
-    { label:'متوسط نسبة المالءمة',   value:avg+'%',      color:cls(avg),                        meta:'للتخصصات المختارة' },
+    { label:'متوسط نسبة الملاءمة',   value:avg+'%',      color:cls(avg),                        meta:'للتخصصات المختارة' },
     { label:'الفجوة الكلية المتوقعة', value:fmtn(Math.abs(gap)), color:gap>0?'green':'red', meta:gap>0?'وظيفة — نقص في الكوادر':'وظيفة — فائض في الكوادر' },
-    { label:'التخصص الأعلى مالءمة',  value:best.compat+'%',  color:'green',                 meta:best.name },
-    { label:'التخصص الأدنى مالءمة',  value:worst.compat+'%', color:cls(worst.compat),       meta:worst.name },
+    { label:'التخصص الأعلى ملاءمة',  value:best.compat+'%',  color:'green',                 meta:best.name },
+    { label:'التخصص الأدنى ملاءمة',  value:worst.compat+'%', color:cls(worst.compat),       meta:worst.name },
   ].map(k => `<div class="kpi ${k.color}">
     <div class="kpi-label">${k.label}</div>
     <div class="kpi-value ${k.color}">${k.value}</div>
@@ -1560,7 +1560,7 @@ function paintCharts({ specs, forecast, yearLabels }) {
   chInst.c4 = new Chart(document.getElementById('ch4'), {
     type:'doughnut',
     data:{
-      labels:['مالءمة مرتفعة','مالءمة متوسطة','مالءمة منخفضة'],
+      labels:['ملاءمة مرتفعة','ملاءمة متوسطة','ملاءمة منخفضة'],
       datasets:[{ data:[hi,md,lo], backgroundColor:['#2d7a4f','#d69e2e','#c53030'], borderWidth:2, borderColor:'#fff' }]
     },
     options:{
@@ -1614,19 +1614,19 @@ function paintReport({ specs, yrs }) {
     <div class="report-sec">
       <div class="report-sec-title">ملخص تنفيذي</div>
       <div class="report-body">
-        تم تنفيذ النموذج لتحليل مستوى المالءمة بين <strong>${specs.length} تخصصات</strong> تعليمية وسوق العمل
+        تم تنفيذ النموذج لتحليل مستوى الملاءمة بين <strong>${specs.length} تخصصات</strong> تعليمية وسوق العمل
         في <strong>${gvLbl}</strong>، لفئة <strong>${gLbl}</strong>، بأفق تنبؤي مدته
         <strong>${yrs} ${yrs===1?'سنة':'سنوات'}</strong> (${yr}–${yr+yrs}).
       </div>
       <div class="report-block ${avg>=75?'success':avg>=55?'info':'warn'}">
-        متوسط نسبة المالءمة الكلية: <strong>${avg}%</strong>
+        متوسط نسبة الملاءمة الكلية: <strong>${avg}%</strong>
         ${avg>=75?' — توافق جيد بين مخرجات التعليم العالي واحتياجات سوق العمل.':avg>=55?' — توافق متوسط يستدعي مراجعة بعض التخصصات.':' — ضعف في التوافق يستدعي تدخلاً في السياسات التعليمية.'}
       </div>
     </div>
     <div class="report-sec">
       <div class="report-sec-title">نتائج التخصصات</div>
       <table class="mini-table">
-        <thead><tr><th>التخصص</th><th>القطاع</th><th>المالءمة</th><th>الفجوة</th><th>التوقع</th></tr></thead>
+        <thead><tr><th>التخصص</th><th>القطاع</th><th>الملاءمة</th><th>الفجوة</th><th>التوقع</th></tr></thead>
         <tbody>${specs.map(s=>`<tr>
           <td><strong>${s.name}</strong></td>
           <td style="font-size:12px;color:var(--text-muted)">${s.sector}</td>
@@ -1640,15 +1640,15 @@ function paintReport({ specs, yrs }) {
       <div class="report-sec-title">أبرز الملاحظات</div>
       <div class="report-body">
         <div class="report-block success">
-          <strong>الأعلى مالءمة:</strong> ${best.name} — ${best.compat}%<br>
+          <strong>الأعلى ملاءمة:</strong> ${best.name} — ${best.compat}%<br>
           توافق قوي مع احتياجات قطاع ${best.sector}.
         </div>
         <div class="report-block ${worst.compat<60?'warn':'info'}">
-          <strong>الأدنى مالءمة:</strong> ${worst.name} — ${worst.compat}%<br>
+          <strong>الأدنى ملاءمة:</strong> ${worst.name} — ${worst.compat}%<br>
           ${worst.compat<60?'يُوصى بمراجعة المناهج وسياسات القبول وربطها بمتطلبات سوق العمل الفعلية.':'فجوة مقبولة مع إمكانية تحسين التوافق.'}
         </div>
         ${specs.filter(s=>s.compat<60).length?`<div class="report-block warn">
-          ${specs.filter(s=>s.compat<60).length} تخصص دون مستوى المالءمة المقبول (60%) — يُنصح بمراجعة سياسات الالتحاق وتعزيز الربط بمتطلبات السوق.
+          ${specs.filter(s=>s.compat<60).length} تخصص دون مستوى الملاءمة المقبول (60%) — يُنصح بمراجعة سياسات الالتحاق وتعزيز الربط بمتطلبات السوق.
         </div>`:''}
       </div>
     </div>
@@ -1671,7 +1671,7 @@ function paintExplanation({ specs, yrs }) {
   const pos     = specs.filter(s=>s.gap>0).map(s=>s.name);
   const neg     = specs.filter(s=>s.gap<0).map(s=>s.name);
 
-  let txt = `تُشير نتائج النموذج إلى أن متوسط مستوى المالءمة بين التخصصات المختارة ومهن سوق العمل يبلغ <strong>${avg}%</strong>`;
+  let txt = `تُشير نتائج النموذج إلى أن متوسط مستوى الملاءمة بين التخصصات المختارة ومهن سوق العمل يبلغ <strong>${avg}%</strong>`;
   txt += avg>=75?'، وهو مستوى مرتفع يعكس توافقاً جيداً بين مخرجات التعليم العالي واحتياجات سوق العمل.'
        :avg>=55?'، وهو مستوى متوسط يستدعي مراجعة بعض التخصصات وتعزيز ربطها بمتطلبات السوق.'
        :'، وهو مستوى منخفض يستدعي تدخلاً في سياسات التعليم والتوجيه المهني.';
